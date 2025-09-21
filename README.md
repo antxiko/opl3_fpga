@@ -1,6 +1,9 @@
 opl3_fpga
 =========
 ## News
+2025-9-21
+* I've added https://github.com/gtaylormb/opl2_fpga which is a conversion of this core to OPL2 with the OPL3 stuff ripped out, as well as https://github.com/gtaylormb/opl2_fpga_MiSTer for easy drop-in to MiSTer cores.
+
 2024-4-27
 * OPL3_FPGA has been merged into https://github.com/MiSTer-devel/ao486_MiSTer and replaced the old Z80-based OPL3 core. This is a very cool project. It's been really fun working with it and playing all the old games from the 90s.
 
