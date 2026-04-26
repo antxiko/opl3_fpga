@@ -541,9 +541,11 @@ module control_operators
     always_ff @(posedge clk)
         modulation_out_p1 <= out_p6;
 
+    // synthesis translate_off
     ERROR_operators_not_aligned_for_modulation:
     assert property (@(posedge clk)
         op_sample_clk_en && op_num == 3 |-> operator_out.valid && operator_out.op_num == 0);
+    // synthesis translate_on
 
     always_comb begin
         operator_out.valid = op_sample_clk_en_p[6];
