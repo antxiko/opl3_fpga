@@ -65,6 +65,12 @@ module timers
     logic irq;
 
     always_ff @(posedge clk) begin
+        // mangopl4: irq_rst es un STROBE en YMF262 real (write 1 → clear
+        // flags → auto vuelve a 0). Sin este default, queda atascado en 1
+        // tras la primera escritura del IRQ handler de VGMPlay y cancela
+        // todo overflow futuro → solo dispara 1 IRQ.
+        irq_rst <= 0;
+
         if (opl3_reg_wr.valid) begin
             if (opl3_reg_wr.bank_num == 0 && opl3_reg_wr.address == 2)
                 timer1 <= opl3_reg_wr.data;
