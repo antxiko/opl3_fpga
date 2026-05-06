@@ -58,7 +58,12 @@ module opl3
     output logic signed [DAC_OUTPUT_WIDTH-1:0] sample_l,
     output logic signed [DAC_OUTPUT_WIDTH-1:0] sample_r,
     output logic [NUM_LEDS-1:0] led,
-    output logic irq_n
+    output logic irq_n,
+    // mangopl4: backdoor del wrapper para apagar st1/st2/ft1/ft2 desde
+    // fuera cuando el watchdog del IRQ se rinde. Sin esto, ft1 sticky
+    // tras un exit "natural" de VGMPlay deja Timer1 corriendo
+    // indefinidamente y la siguiente ejecución no detecta MoonSound.
+    input wire force_clear_flags
 );
     logic reset;
     logic sample_clk_en;

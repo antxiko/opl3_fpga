@@ -49,7 +49,13 @@ module timers
     input var opl3_reg_wr_t opl3_reg_wr,
     output logic irq_n = 0,
     output logic [REG_FILE_DATA_WIDTH-1:0] status,
-    input wire force_timer_overflow // comes from trick_sw_detection logic
+    input wire force_timer_overflow, // comes from trick_sw_detection logic
+    // mangopl4: backdoor del wrapper. Cuando el watchdog del wrapper se
+    // rinde (gave_up), el software no está limpiando ft1 y Timer1 sigue
+    // corriendo. Esta señal apaga internamente st1/st2/ft1/ft2 (soft reset
+    // del subsistema de timers) sin tocar mt1/mt2/timer1/timer2 ni
+    // requerir un write al registro 4 desde el bus.
+    input wire force_clear_flags
 );
     logic [REG_TIMER_WIDTH-1:0] timer1 = 0;
     logic [REG_TIMER_WIDTH-1:0] timer2 = 0;
@@ -96,6 +102,15 @@ module timers
             st2 <= 0;
             st1 <= 0;
         end
+
+        // mangopl4: el wrapper se rindió. Apagamos st1/st2 para parar los
+        // timers internamente. mt1/mt2 quedan como estaban (no necesitan
+        // tocarse). Esto NO previene que el host vuelva a programar st1
+        // en una nueva sesión — solo limpia el estado actual.
+        if (force_clear_flags) begin
+            st1 <= 0;
+            st2 <= 0;
+        end
     end
 
     // mangopl4: TICK_COUNT precomputado entero (Gowin trunca mal CLK_FREQ*TIMER_TICK_INTERVAL).
@@ -125,7 +140,7 @@ module timers
         if (timer2_overflow_pulse && !mt2)
             ft2 <= 1;
 
-        if (reset || irq_rst) begin
+        if (reset || irq_rst || force_clear_flags) begin
             ft1 <= 0;
             ft2 <= 0;
         end
